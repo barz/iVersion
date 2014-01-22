@@ -542,11 +542,14 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
             }
             
             //deprecated code path
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
             else if ([self.delegate respondsToSelector:@selector(iVersionVersionCheckFailed:)])
             {
                 NSLog(@"iVersionVersionCheckFailed: delegate method is deprecated, use iVersionVersionCheckDidFailWithError: instead");
                 [self.delegate performSelector:@selector(iVersionVersionCheckFailed:) withObject:self.downloadError];
             }
+#pragma clang diagnostic pop
             return;
         }
         
@@ -562,11 +565,14 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
             }
             
             //deprecated code path
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
             else if ([self.delegate respondsToSelector:@selector(iVersionDetectedNewVersion:details:)])
             {
                 NSLog(@"iVersionDetectedNewVersion:details: delegate method is deprecated, use iVersionDidDetectNewVersion:details: instead");
                 [self.delegate performSelector:@selector(iVersionDetectedNewVersion:details:) withObject:mostRecentVersion withObject:details];
             }
+#pragma clang diagnostic pop
             
             //check if ignored
             BOOL showDetails = ![self.ignoredVersion isEqualToString:mostRecentVersion] || self.previewMode;
