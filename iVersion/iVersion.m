@@ -893,33 +893,33 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
                             NSLog(@"iVersion will check %@ for %@", self.remoteVersionsPlistURL, self.appStoreID? @"release notes": @"a new app version");
                         }
                         
-                        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.remoteVersionsPlistURL] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:REQUEST_TIMEOUT];
-                        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-                        if (data)
+                        NSURLRequest *plistRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:self.remoteVersionsPlistURL] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:REQUEST_TIMEOUT];
+                        NSData *plistData = [NSURLConnection sendSynchronousRequest:plistRequest returningResponse:&response error:&error];
+                        if (plistData)
                         {
                             NSDictionary *plistVersions = nil;
                             NSPropertyListFormat format;
                             
                             if ([NSPropertyListSerialization respondsToSelector:@selector(propertyListWithData:options:format:error:)])
                             {
-                                plistVersions = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:&format error:&error];
+                                plistVersions = [NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListImmutable format:&format error:&error];
                             }
                             else
                             {
-                                plistVersions = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:0 format:&format errorDescription:NULL];
+                                plistVersions = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:0 format:&format errorDescription:NULL];
                             }
                             if (latestVersion)
                             {
                                 //remove versions that are greater than latest in app store
-                                NSMutableDictionary *versions = [NSMutableDictionary dictionary];
+                                NSMutableDictionary *versionsDict = [NSMutableDictionary dictionary];
                                 for (NSString *version in plistVersions)
                                 {
                                     if ([version compareVersion:latestVersion] != NSOrderedDescending)
                                     {
-                                        versions[version] = plistVersions[version];
+                                        versionsDict[version] = plistVersions[version];
                                     }
                                 }
-                                plistVersions = versions;
+                                plistVersions = versionsDict;
                             }
                             if (!latestVersion || plistVersions[latestVersion] || !_useAppStoreDetailsIfNoPlistEntryFound)
                             {
