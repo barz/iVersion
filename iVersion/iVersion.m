@@ -762,7 +762,10 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
 
 - (void)setAppStoreIDOnMainThread:(NSString *)appStoreIDString
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshorten-64-to-32"
     self.appStoreID = [appStoreIDString longLongValue];
+#pragma GCC diagnostic pop
 }
 
 - (void)checkForNewVersionInBackground
