@@ -1,7 +1,7 @@
 //
 //  iVersion.h
 //
-//  Version 1.11 beta 5
+//  Version 1.11.4
 //
 //  Created by Nick Lockwood on 26/01/2011.
 //  Copyright 2011 Charcoal Design
@@ -31,6 +31,10 @@
 //
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-missing-property-synthesis"
+
+
 #import <Availability.h>
 #undef weak_delegate
 #if __has_feature(objc_arc_weak) && \
@@ -41,10 +45,13 @@
 #endif
 
 
+#import <TargetConditionals.h>
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
+#define IVERSION_EXTERN UIKIT_EXTERN
 #else
 #import <Cocoa/Cocoa.h>
+#define IVERSION_EXTERN APPKIT_EXTERN
 #endif
 
 
@@ -55,23 +62,31 @@
 
 extern NSString *const iVersionErrorDomain;
 
-
 //localisation string keys
-static NSString *const iVersionInThisVersionTitleKey = @"iVersionInThisVersionTitle";
-static NSString *const iVersionUpdateAvailableTitleKey = @"iVersionUpdateAvailableTitle";
-static NSString *const iVersionVersionLabelFormatKey = @"iVersionVersionLabelFormat";
-static NSString *const iVersionOKButtonKey = @"iVersionOKButton";
-static NSString *const iVersionIgnoreButtonKey = @"iVersionIgnoreButton";
-static NSString *const iVersionRemindButtonKey = @"iVersionRemindButton";
-static NSString *const iVersionDownloadButtonKey = @"iVersionDownloadButton";
+IVERSION_EXTERN NSString *const iVersionInThisVersionTitleKey; //iVersionInThisVersionTitle
+IVERSION_EXTERN NSString *const iVersionUpdateAvailableTitleKey; //iVersionUpdateAvailableTitle
+IVERSION_EXTERN NSString *const iVersionVersionLabelFormatKey; //iVersionVersionLabelFormat
+IVERSION_EXTERN NSString *const iVersionOKButtonKey; //iVersionOKButton
+IVERSION_EXTERN NSString *const iVersionIgnoreButtonKey; //iVersionIgnoreButton
+IVERSION_EXTERN NSString *const iVersionRemindButtonKey; //iVersionRemindButton
+IVERSION_EXTERN NSString *const iVersionDownloadButtonKey; //iVersionDownloadButton
 
 
-typedef enum
+typedef NS_ENUM(NSUInteger, iVersionErrorCode)
 {
     iVersionErrorBundleIdDoesNotMatchAppStore = 1,
-    iVersionErrorApplicationNotFoundOnAppStore
-}
-iVersionErrorCode;
+    iVersionErrorApplicationNotFoundOnAppStore,
+    iVersionErrorOSVersionNotSupported
+};
+
+
+typedef NS_ENUM(NSInteger, iVersionUpdatePriority)
+{
+    iVersionUpdatePriorityDefault = 0,
+    iVersionUpdatePriorityLow = 1,
+    iVersionUpdatePriorityMedium = 2,
+    iVersionUpdatePriorityHigh = 3
+};
 
 
 @interface NSString(iVersion)
@@ -130,6 +145,8 @@ iVersionErrorCode;
 @property (nonatomic, copy) NSString *downloadButtonLabel;
 
 //debugging and prompt overrides
+@property (nonatomic, assign) iVersionUpdatePriority updatePriority;
+@property (nonatomic, assign) BOOL useUIAlertControllerIfAvailable;
 @property (nonatomic, assign) BOOL useAllAvailableLanguages;
 @property (nonatomic, assign) BOOL onlyPromptIfMainWindowIsAvailable;
 @property (nonatomic, assign) BOOL useAppStoreDetailsIfNoPlistEntryFound;
@@ -155,3 +172,7 @@ iVersionErrorCode;
 - (void)checkForNewVersion;
 
 @end
+
+
+#pragma clang diagnostic pop
+
